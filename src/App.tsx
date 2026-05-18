@@ -34,8 +34,8 @@ type ModeOption = {
 };
 
 const modeOptions: ModeOption[] = [
-  { id: "mesh", label: "Mesh", Icon: Box },
-  { id: "focus", label: "Focus", Icon: CircleDot },
+  { id: "mesh", label: "Sel Utuh", Icon: Box },
+  { id: "focus", label: "Fokus", Icon: CircleDot },
 ];
 
 const initialCell = getCellById("animal");
@@ -48,29 +48,29 @@ function Header({ cell }: { cell: CellItem }) {
           <Sparkles size={26} />
         </div>
         <div>
-          <h1>Cell Architecture Studio</h1>
-          <p>Explore life at the microscopic level</p>
+          <h1>Studio Arsitektur Sel</h1>
+          <p>Jelajahi keajaiban kehidupan di dunia mikroskopis</p>
         </div>
       </div>
 
       <nav className="top-nav" aria-label="Primary">
         <a href="#gallery">
           <Grid3X3 size={24} />
-          <span>Gallery</span>
+          <span>Galeri</span>
         </a>
         <a href="#library">
           <Library size={24} />
-          <span>Library</span>
+          <span>Pustaka</span>
         </a>
         <a href="#notebooks">
           <BookOpen size={24} />
-          <span>Notebooks</span>
+          <span>Catatan</span>
         </a>
         <a href="#settings">
           <Settings size={24} />
-          <span>Settings</span>
+          <span>Pengaturan</span>
         </a>
-        <button className="avatar-button" type="button" aria-label="User menu">
+        <button className="avatar-button" type="button" aria-label="Menu pengguna">
           <span className="avatar-core" style={{ background: cell.accentSoft }}>
             <span style={{ background: cell.accent }} />
           </span>
@@ -130,7 +130,7 @@ function Sidebar({
         <div className="panel-heading">
           <span>
             <Leaf size={18} />
-            Cell Types
+            Jenis Sel
           </span>
           <ChevronDown size={18} />
         </div>
@@ -158,7 +158,7 @@ function Sidebar({
                   }}
                   role="button"
                   tabIndex={0}
-                  aria-label={`Favorite ${cell.name}`}
+                  aria-label={`Favoritkan ${cell.name}`}
                 >
                   <Star size={18} fill="currentColor" />
                 </span>
@@ -172,7 +172,7 @@ function Sidebar({
         <div className="panel-heading">
           <span>
             <Sparkles size={16} />
-            Organelles
+            Organel
           </span>
           <ChevronDown size={18} />
         </div>
@@ -232,7 +232,7 @@ function Stage({
           </div>
 
           <div className="view-card">
-            <span>View Mode</span>
+            <span>Mode Tampilan</span>
             <div className="mode-switcher">
               {modeOptions.map(({ id, label, Icon }) => (
                 <button
@@ -247,7 +247,7 @@ function Stage({
               ))}
             </div>
             <label className="toggle-line">
-              <span>Cross Section</span>
+              <span>Belah Sel</span>
               <input
                 type="checkbox"
                 checked={crossSection}
@@ -276,30 +276,30 @@ function Stage({
             onClick={() => onAutoRotateChange(!autoRotate)}
           >
             <RotateCcw size={20} />
-            Rotate
+            Putar
           </button>
           <button type="button" onClick={() => onModeChange("focus")}>
             <CircleDot size={20} />
-            Isolate
+            Pisahkan
           </button>
           <button type="button" onClick={() => onModeChange("focus")}>
             <EyeOff size={20} />
-            Hide Others
+            Sembunyikan Lainnya
           </button>
           <button type="button" onClick={onReset}>
             <RotateCcw size={20} />
-            Reset View
+            Atur Ulang
           </button>
         </div>
 
         <div className="export-toolbar">
-          <button type="button" onClick={() => onToast("截图功能这里先做占位。")}>
+          <button type="button" onClick={() => onToast("Fitur tangkapan layar akan segera hadir.")}>
             <Camera size={20} />
-            Screenshot
+            Tangkapan Layar
           </button>
-          <button type="button" onClick={() => onToast("GLB 导出需要接入模型导出管线。")}>
+          <button type="button" onClick={() => onToast("Fitur ekspor model 3D akan segera hadir.")}>
             <Box size={20} />
-            GLB Export
+            Ekspor 3D
           </button>
         </div>
       </section>
@@ -322,9 +322,9 @@ type RightPanelProps = {
 
 function buildTutorPrompts(cell: CellItem, organelle: CellItem["organelles"][number]) {
   return [
-    `Explain how ${organelle.name} helps a ${cell.name} stay alive.`,
-    `Quiz me on the visual differences between ${cell.name} and ${getCellById(cell.comparison).name}.`,
-    `Guide me through finding ${organelle.name} inside the 3D model.`,
+    `Jelaskan bagaimana ${organelle.name} membantu ${cell.name} tetap hidup.`,
+    `Beri aku kuis tentang perbedaan ${cell.name} dan ${getCellById(cell.comparison).name}.`,
+    `Bantu aku menemukan ${organelle.name} di dalam model 3D.`,
   ];
 }
 
@@ -347,8 +347,8 @@ function RightPanel({
     <aside className="right-rail">
       <section className="panel details-panel">
         <div className="panel-heading detail-heading">
-          <span>Organelle Details</span>
-          <button type="button" onClick={() => onToggleFavorite(cell.id)} aria-label="Toggle favorite">
+          <span>Detail Organel</span>
+          <button type="button" onClick={() => onToggleFavorite(cell.id)} aria-label="Tandai favorit">
             <Heart size={22} fill={favorites.has(cell.id) ? "currentColor" : "none"} />
           </button>
         </div>
@@ -369,7 +369,7 @@ function RightPanel({
             </div>
           ))}
           <div>
-            <dt>Label</dt>
+            <dt>Penanda</dt>
             <dd>
               <span className="mini-toggle is-on" />
               <span className="detail-dot" style={{ background: organelle.color }} />
@@ -380,11 +380,11 @@ function RightPanel({
 
       <section className="panel notes-panel">
         <div className="panel-heading">
-          <span>Biological Notes</span>
+          <span>Catatan Biologi</span>
         </div>
         <p>{organelle.note}</p>
         <div className="fun-fact">
-          <span>Fun Fact: {organelle.fact}</span>
+          <span>Tahukah kamu? {organelle.fact}</span>
           <Sparkles size={18} />
         </div>
       </section>
@@ -393,31 +393,31 @@ function RightPanel({
         <div className="panel-heading">
           <span>
             <Brain size={17} />
-            AI Tutor
+            Pemandu Pintar
           </span>
         </div>
 
         <div className="mastery-meter" style={{ "--progress": `${mastery}%` } as CSSProperties}>
           <div>
             <Gauge size={18} />
-            <span>Mastery</span>
+            <span>Skor Belajar</span>
             <strong>{mastery}%</strong>
           </div>
           <i>
             <b />
           </i>
           <small>
-            {viewedCellCount}/{cells.length} cells explored · {viewedOrganelleCount}/{totalOrganelleCount} organelles inspected
+            {viewedCellCount}/{cells.length} sel dijelajahi · {viewedOrganelleCount}/{totalOrganelleCount} organel diamati
           </small>
         </div>
 
         <div className="lesson-focus">
           <span>
             <Target size={17} />
-            Current lesson focus
+            Fokus belajar saat ini
           </span>
           <p>
-            Locate <strong>{organelle.name}</strong>, explain its role, then compare it with the matching structure in{" "}
+            Temukan <strong>{organelle.name}</strong>, jelaskan tugasnya, lalu bandingkan dengan bagian serupa pada{" "}
             {getCellById(cell.comparison).name}.
           </p>
         </div>
@@ -425,7 +425,7 @@ function RightPanel({
         <div className="tutor-prompt">
           <span>
             <MessageCircle size={17} />
-            Prompt staged for AI tutor
+            Pertanyaan siap untuk pemandu
           </span>
           <p>{tutorPrompt}</p>
         </div>
@@ -441,7 +441,7 @@ function RightPanel({
 
       <section className="panel occurrence-panel">
         <div className="panel-heading">
-          <span>Where It Occurs</span>
+          <span>Di Mana Sel Ini Berada</span>
         </div>
         <div className={`occurrence-art occurrence-${cell.occurrence.motif}`}>
           <span />
@@ -469,7 +469,7 @@ function BottomPanels({ cell, onCompare, onToast }: BottomPanelsProps) {
       <div className="panel microscope-panel">
         <div className="panel-heading">
           <span>
-            Microscope View
+            Tampilan Mikroskop
             <Info size={16} />
           </span>
         </div>
@@ -480,15 +480,15 @@ function BottomPanels({ cell, onCompare, onToast }: BottomPanelsProps) {
               key={image.label}
               className={`micro-card pattern-${image.pattern}`}
               style={{ "--micro": image.tone } as CSSProperties}
-              onClick={() => onToast(`${image.label} selected.`)}
+              onClick={() => onToast(`${image.label} dipilih.`)}
             >
               <span />
               <strong>{image.label}</strong>
             </button>
           ))}
-          <button type="button" className="micro-card add-card" onClick={() => onToast("Image upload is a planned step.")}>
+          <button type="button" className="micro-card add-card" onClick={() => onToast("Fitur unggah gambar akan segera hadir.")}>
             <Plus size={28} />
-            <strong>Add Image</strong>
+            <strong>Tambah Gambar</strong>
           </button>
         </div>
       </div>
@@ -496,7 +496,7 @@ function BottomPanels({ cell, onCompare, onToast }: BottomPanelsProps) {
       <div className="panel compare-panel">
         <div className="panel-heading">
           <span>
-            Compare Cells
+            Bandingkan Sel
             <Info size={16} />
           </span>
         </div>
@@ -505,7 +505,7 @@ function BottomPanels({ cell, onCompare, onToast }: BottomPanelsProps) {
             <MiniCell cell={cell} />
             <span>
               <strong>{cell.name}</strong>
-              <em>You are here</em>
+              <em>Kamu di sini</em>
             </span>
           </div>
           <b>VS</b>
@@ -518,7 +518,7 @@ function BottomPanels({ cell, onCompare, onToast }: BottomPanelsProps) {
           </div>
         </div>
         <button type="button" className="comparison-button" onClick={onCompare}>
-          Open Comparison View
+          Buka Tampilan Perbandingan
           <ArrowRight size={20} />
         </button>
       </div>
@@ -543,15 +543,15 @@ function ComparisonModal({ cell, open, onClose }: ComparisonModalProps) {
     comparedCell.organelles.find((item) => item.id === comparedCell.defaultOrganelle) ?? comparedCell.organelles[0];
 
   return (
-    <div className="modal-layer" role="dialog" aria-modal="true" aria-label="Cell comparison">
+    <div className="modal-layer" role="dialog" aria-modal="true" aria-label="Perbandingan sel">
       <div className="comparison-modal">
         <button className="modal-close" type="button" onClick={onClose}>
-          Close
+          Tutup
         </button>
         <div className="comparison-modal-head">
-          <h3>Comparison View</h3>
+          <h3>Tampilan Perbandingan</h3>
           <p>
-            {cell.name} compared with {comparedCell.name}
+            {cell.name} dibandingkan dengan {comparedCell.name}
           </p>
         </div>
         <div className="comparison-columns">
@@ -564,15 +564,15 @@ function ComparisonModal({ cell, open, onClose }: ComparisonModalProps) {
                 <p>{item.type}</p>
                 <dl>
                   <div>
-                    <dt>Default focus</dt>
+                    <dt>Fokus utama</dt>
                     <dd>{organelle.name}</dd>
                   </div>
                   <div>
-                    <dt>Main note</dt>
+                    <dt>Catatan utama</dt>
                     <dd>{organelle.subtitle}</dd>
                   </div>
                   <div>
-                    <dt>Occurs in</dt>
+                    <dt>Terdapat di</dt>
                     <dd>{item.occurrence.title}</dd>
                   </div>
                 </dl>
@@ -606,7 +606,7 @@ export default function App() {
   );
   const [comparisonOpen, setComparisonOpen] = useState(false);
   const [tutorPrompt, setTutorPrompt] = useState(
-    `Guide me through finding ${initialCell.organelles[0].name} inside the 3D model.`,
+    `Bantu aku menemukan ${initialCell.organelles[0].name} di dalam model 3D.`,
   );
   const [toast, setToast] = useState<string | null>(null);
   const toastTimer = useRef<number | null>(null);
@@ -693,7 +693,7 @@ export default function App() {
             onAutoRotateChange={setAutoRotate}
             onReset={() => {
               setResetKey((key) => key + 1);
-              showToast("View reset.");
+              showToast("Tampilan diatur ulang.");
             }}
             onToast={showToast}
           />
@@ -716,7 +716,7 @@ export default function App() {
           onToggleFavorite={toggleFavorite}
           onTutorPrompt={(prompt) => {
             setTutorPrompt(prompt);
-            showToast("AI tutor prompt staged.");
+            showToast("Pertanyaan untuk pemandu sudah disiapkan.");
           }}
         />
       </div>
