@@ -3,7 +3,6 @@ import {
   BookOpen,
   Box,
   Brain,
-  Camera,
   ChevronDown,
   CircleDot,
   Gauge,
@@ -15,8 +14,8 @@ import {
   MessageCircle,
   Library,
   Microscope,
-  Plus,
   RotateCcw,
+  Search,
   Settings,
   Sparkles,
   Star,
@@ -40,10 +39,27 @@ const modeOptions: ModeOption[] = [
 
 const initialCell = getCellById("animal");
 
-function Header({ cell }: { cell: CellItem }) {
+type AppView = "gallery" | "studio" | "library" | "notebooks" | "settings";
+
+const navItems: Array<{ id: AppView; label: string; Icon: LucideIcon }> = [
+  { id: "gallery", label: "Galeri", Icon: Grid3X3 },
+  { id: "library", label: "Pustaka", Icon: Library },
+  { id: "notebooks", label: "Catatan", Icon: BookOpen },
+  { id: "settings", label: "Pengaturan", Icon: Settings },
+];
+
+function Header({
+  cell,
+  view,
+  onNavigate,
+}: {
+  cell: CellItem;
+  view: AppView;
+  onNavigate: (view: AppView) => void;
+}) {
   return (
     <header className="topbar">
-      <div className="brand-block">
+      <button className="brand-block" type="button" onClick={() => onNavigate("gallery")}>
         <div className="brand-orb" aria-hidden="true">
           <Sparkles size={26} />
         </div>
@@ -51,25 +67,23 @@ function Header({ cell }: { cell: CellItem }) {
           <h1>Studio Arsitektur Sel</h1>
           <p>Jelajahi keajaiban kehidupan di dunia mikroskopis</p>
         </div>
-      </div>
+      </button>
 
-      <nav className="top-nav" aria-label="Primary">
-        <a href="#gallery">
-          <Grid3X3 size={24} />
-          <span>Galeri</span>
-        </a>
-        <a href="#library">
-          <Library size={24} />
-          <span>Pustaka</span>
-        </a>
-        <a href="#notebooks">
-          <BookOpen size={24} />
-          <span>Catatan</span>
-        </a>
-        <a href="#settings">
-          <Settings size={24} />
-          <span>Pengaturan</span>
-        </a>
+      <nav className="top-nav" aria-label="Menu utama">
+        {navItems.map(({ id, label, Icon }) => {
+          const active = view === id || (id === "gallery" && view === "studio");
+          return (
+            <button
+              key={id}
+              type="button"
+              className={`nav-link ${active ? "is-active" : ""}`}
+              onClick={() => onNavigate(id)}
+            >
+              <Icon size={24} />
+              <span>{label}</span>
+            </button>
+          );
+        })}
         <button className="avatar-button" type="button" aria-label="Menu pengguna">
           <span className="avatar-core" style={{ background: cell.accentSoft }}>
             <span style={{ background: cell.accent }} />
@@ -206,7 +220,6 @@ type StageProps = {
   onCrossSectionChange: (value: boolean) => void;
   onAutoRotateChange: (value: boolean) => void;
   onReset: () => void;
-  onToast: (message: string) => void;
 };
 
 function Stage({
@@ -220,7 +233,6 @@ function Stage({
   onCrossSectionChange,
   onAutoRotateChange,
   onReset,
-  onToast,
 }: StageProps) {
   return (
     <main className="stage-column">
@@ -289,17 +301,6 @@ function Stage({
           <button type="button" onClick={onReset}>
             <RotateCcw size={20} />
             Atur Ulang
-          </button>
-        </div>
-
-        <div className="export-toolbar">
-          <button type="button" onClick={() => onToast("Fitur tangkapan layar akan segera hadir.")}>
-            <Camera size={20} />
-            Tangkapan Layar
-          </button>
-          <button type="button" onClick={() => onToast("Fitur ekspor model 3D akan segera hadir.")}>
-            <Box size={20} />
-            Ekspor 3D
           </button>
         </div>
       </section>
@@ -486,10 +487,6 @@ function BottomPanels({ cell, onCompare, onToast }: BottomPanelsProps) {
               <strong>{image.label}</strong>
             </button>
           ))}
-          <button type="button" className="micro-card add-card" onClick={() => onToast("Fitur unggah gambar akan segera hadir.")}>
-            <Plus size={28} />
-            <strong>Tambah Gambar</strong>
-          </button>
         </div>
       </div>
 
@@ -592,7 +589,227 @@ function Toast({ message }: { message: string | null }) {
   return <div className="toast">{message}</div>;
 }
 
+function CellCard({
+  cell,
+  ctaLabel,
+  onOpen,
+}: {
+  cell: CellItem;
+  ctaLabel: string;
+  onOpen: (id: string) => void;
+}) {
+  return (
+    <button
+      type="button"
+      className="gallery-card"
+      style={{ "--accent": cell.accent, "--accent-soft": cell.accentSoft } as CSSProperties}
+      onClick={() => onOpen(cell.id)}
+    >
+      <MiniCell cell={cell} />
+      <strong>{cell.name}</strong>
+      <span className="gallery-card-type">{cell.type}</span>
+      <p>{cell.occurrence.body}</p>
+      <span className="gallery-card-cta">
+        {ctaLabel}
+        <ArrowRight size={18} />
+      </span>
+    </button>
+  );
+}
+
+function GalleryPage({ onSelectCell }: { onSelectCell: (id: string) => void }) {
+  return (
+    <main className="page gallery-page">
+      <div className="page-intro">
+        <h2>Pilih Sel untuk Dijelajahi</h2>
+        <p>
+          Ketuk salah satu kartu di bawah untuk melihat selnya dalam bentuk 3D dan mengenal
+          bagian-bagiannya.
+        </p>
+      </div>
+      <div className="gallery-grid">
+        {cells.map((cell) => (
+          <CellCard key={cell.id} cell={cell} ctaLabel="Jelajahi" onOpen={onSelectCell} />
+        ))}
+      </div>
+    </main>
+  );
+}
+
+type GlossaryEntry = {
+  name: string;
+  subtitle: string;
+  note: string;
+  color: string;
+  cells: string[];
+};
+
+function buildGlossary(): GlossaryEntry[] {
+  const map = new Map<string, GlossaryEntry>();
+  for (const cell of cells) {
+    for (const organelle of cell.organelles) {
+      const existing = map.get(organelle.name);
+      if (existing) {
+        if (!existing.cells.includes(cell.name)) {
+          existing.cells.push(cell.name);
+        }
+      } else {
+        map.set(organelle.name, {
+          name: organelle.name,
+          subtitle: organelle.subtitle,
+          note: organelle.note,
+          color: organelle.color,
+          cells: [cell.name],
+        });
+      }
+    }
+  }
+  return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name, "id"));
+}
+
+function LibraryPage() {
+  const [query, setQuery] = useState("");
+  const glossary = useMemo(buildGlossary, []);
+  const term = query.trim().toLowerCase();
+  const filtered = glossary.filter(
+    (entry) =>
+      entry.name.toLowerCase().includes(term) || entry.note.toLowerCase().includes(term),
+  );
+
+  return (
+    <main className="page library-page">
+      <div className="page-intro">
+        <h2>Pustaka Organel</h2>
+        <p>Kamus bagian-bagian sel. Cari istilah yang ingin kamu pahami.</p>
+      </div>
+      <div className="library-search">
+        <Search size={18} />
+        <input
+          type="search"
+          placeholder="Cari organel, misalnya: kloroplas"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+        />
+      </div>
+      {filtered.length === 0 ? (
+        <p className="empty-hint">Tidak ada organel yang cocok dengan pencarianmu.</p>
+      ) : (
+        <div className="glossary-grid">
+          {filtered.map((entry) => (
+            <article key={entry.name} className="panel glossary-card">
+              <div className="glossary-card-head">
+                <span className="color-dot" style={{ background: entry.color }} />
+                <div>
+                  <h3>{entry.name}</h3>
+                  <p>{entry.subtitle}</p>
+                </div>
+              </div>
+              <p className="glossary-note">{entry.note}</p>
+              <span className="glossary-tag">Ada di: {entry.cells.join(", ")}</span>
+            </article>
+          ))}
+        </div>
+      )}
+    </main>
+  );
+}
+
+function NotebooksPage({
+  favorites,
+  mastery,
+  viewedCellCount,
+  onSelectCell,
+}: {
+  favorites: Set<string>;
+  mastery: number;
+  viewedCellCount: number;
+  onSelectCell: (id: string) => void;
+}) {
+  const favoriteCells = cells.filter((cell) => favorites.has(cell.id));
+
+  return (
+    <main className="page notebooks-page">
+      <div className="page-intro">
+        <h2>Catatanku</h2>
+        <p>Sel favoritmu dan kemajuan belajarmu terkumpul di sini.</p>
+      </div>
+      <div className="notebook-stats">
+        <div className="panel stat-card">
+          <Gauge size={26} />
+          <strong>{mastery}%</strong>
+          <span>Skor Belajar</span>
+        </div>
+        <div className="panel stat-card">
+          <Grid3X3 size={26} />
+          <strong>
+            {viewedCellCount}/{cells.length}
+          </strong>
+          <span>Sel Dijelajahi</span>
+        </div>
+        <div className="panel stat-card">
+          <Star size={26} />
+          <strong>{favoriteCells.length}</strong>
+          <span>Sel Favorit</span>
+        </div>
+      </div>
+      <h3 className="notebook-subhead">Sel Favoritku</h3>
+      {favoriteCells.length === 0 ? (
+        <p className="empty-hint">
+          Belum ada sel favorit. Ketuk ikon bintang pada sebuah sel untuk menyimpannya di sini.
+        </p>
+      ) : (
+        <div className="gallery-grid">
+          {favoriteCells.map((cell) => (
+            <CellCard key={cell.id} cell={cell} ctaLabel="Buka" onOpen={onSelectCell} />
+          ))}
+        </div>
+      )}
+    </main>
+  );
+}
+
+function SettingsPage({
+  autoRotate,
+  onAutoRotateChange,
+}: {
+  autoRotate: boolean;
+  onAutoRotateChange: (value: boolean) => void;
+}) {
+  return (
+    <main className="page settings-page">
+      <div className="page-intro">
+        <h2>Tentang Studio</h2>
+      </div>
+      <article className="panel about-panel">
+        <Sparkles size={28} />
+        <p>
+          <strong>Studio Arsitektur Sel</strong> dibuat untuk para pelajar SD dan SMP di Indonesia,
+          supaya belajar sains terasa seru dan penuh rasa ingin tahu. Jelajahi sel dalam bentuk 3D,
+          kenali bagian-bagiannya, lalu uji pemahamanmu lewat kuis.
+        </p>
+      </article>
+      <article className="panel">
+        <div className="panel-heading">
+          <span>Pengaturan</span>
+        </div>
+        <label className="settings-row">
+          <div>
+            <strong>Putar otomatis</strong>
+            <span>Sel berputar pelan saat pertama dibuka.</span>
+          </div>
+          <input
+            type="checkbox"
+            checked={autoRotate}
+            onChange={(event) => onAutoRotateChange(event.target.checked)}
+          />
+        </label>
+      </article>
+    </main>
+  );
+}
+
 export default function App() {
+  const [view, setView] = useState<AppView>("gallery");
   const [selectedCellId, setSelectedCellId] = useState(initialCell.id);
   const [activeOrganelle, setActiveOrganelle] = useState(initialCell.defaultOrganelle);
   const [viewMode, setViewMode] = useState<ViewMode>("mesh");
@@ -648,6 +865,11 @@ export default function App() {
     toastTimer.current = window.setTimeout(() => setToast(null), 2600);
   }
 
+  function openCell(id: string) {
+    setSelectedCellId(id);
+    setView("studio");
+  }
+
   function toggleFavorite(id: string) {
     setFavorites((current) => {
       const next = new Set(current);
@@ -668,8 +890,23 @@ export default function App() {
 
   return (
     <div className="app-shell" style={shellStyle}>
-      <Header cell={selectedCell} />
+      <Header cell={selectedCell} view={view} onNavigate={setView} />
 
+      {view === "gallery" && <GalleryPage onSelectCell={openCell} />}
+      {view === "library" && <LibraryPage />}
+      {view === "notebooks" && (
+        <NotebooksPage
+          favorites={favorites}
+          mastery={mastery}
+          viewedCellCount={viewedCells.size}
+          onSelectCell={openCell}
+        />
+      )}
+      {view === "settings" && (
+        <SettingsPage autoRotate={autoRotate} onAutoRotateChange={setAutoRotate} />
+      )}
+
+      {view === "studio" && (
       <div className="app-grid">
         <Sidebar
           selectedCell={selectedCell}
@@ -695,7 +932,6 @@ export default function App() {
               setResetKey((key) => key + 1);
               showToast("Tampilan diatur ulang.");
             }}
-            onToast={showToast}
           />
           <BottomPanels
             cell={selectedCell}
@@ -720,6 +956,7 @@ export default function App() {
           }}
         />
       </div>
+      )}
 
       <ComparisonModal cell={selectedCell} open={comparisonOpen} onClose={() => setComparisonOpen(false)} />
       <Toast message={toast} />
